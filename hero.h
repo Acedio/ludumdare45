@@ -11,11 +11,11 @@
 class Hero {
  public:
   // Should this take a const TileMap&?
-  void Update(double t, ButtonState buttons);
+  void Update(double t, ButtonState buttons, const TileMap& tilemap);
   void Draw(SDL_Renderer* renderer) const;
 
   Hero(const TileSet* tileset, Vec pos)
-      : bounding_box{pos.x, pos.y, 1, 1},
+      : bounding_box{pos.x, pos.y, 0.8, 0.9},
         vel{0, 0},
         left(tileset, 3),
         right(tileset, 4),

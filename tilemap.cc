@@ -1,6 +1,6 @@
 #include "tilemap.h"
 
-#include <iostream>
+#include <cmath>
 
 #include "log.h"
 
@@ -9,6 +9,8 @@ const int kTileCols = 16;
 const int kTileWidth = 16;
 const int kTileHeight = 16;
 const Tile kEmptyTile = 0;
+
+const double kBuffer = 0.001;
 
 SDL_Rect ToSDLRect(const Rect& rect) {
   SDL_Rect sr;
@@ -138,5 +140,83 @@ void TileMap::Draw(SDL_Renderer* renderer) const {
       dst.x = col * kTileWidth;
       tileset->DrawTile(renderer, tilerow[col], dst);
     }
+  }
+}
+
+TileType TileMap::AtPoint(const Vec& p) const {
+  int tile_x = (int)p.x;
+  int tile_y = (int)p.y;
+  if (tile_y < 0 || tile_y >= map.size()) {
+    return TileType::OOB;
+  }
+  if (tile_x <0 || tile_x >= map[tile_y].size()) {
+    return TileType::OOB;
+  }
+  return TileToTileType(map[tile_y][tile_x]);
+}
+
+// HACK: Assume no Rect is larger than a unit square, so just check corners.
+CollisionInfo TileMap::XCollide(const Rect& rect, double dx) const {
+  double x1 = rect.x + dx;
+  double y1 = rect.y;
+  double x2 = rect.x + rect.w + dx;
+  double y2 = rect.y + rect.h;
+
+  CollisionInfo ci;
+  TileType t = TileType::NONE;
+
+  if (dx <= 0) {
+    // Velocity is negative, check left side.
+    // TODO: If you hit both GROUND and SPIKES, probably just return GROUND.
+    if (t = AtPoint({x1, y1}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = ceil(x1) - x1 + kBuffer;
+    } else if (t = AtPoint({x1, y2}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = ceil(x1) - x1 + kBuffer;
+    }
+    return ci;
+  } else {
+    // Velocity is positive, check right side.
+    if (t = AtPoint({x2, y1}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = floor(x2) - x2 - kBuffer;
+    } else if (t = AtPoint({x2, y2}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = floor(x2) - x2 - kBuffer;
+    }
+    return ci;
+  }
+}
+
+CollisionInfo TileMap::YCollide(const Rect& rect, double dy) const {
+  double x1 = rect.x;
+  double y1 = rect.y + dy;
+  double x2 = rect.x + rect.w;
+  double y2 = rect.y + rect.h + dy;
+
+  CollisionInfo ci;
+  TileType t = TileType::NONE;
+
+  if (dy <= 0) {
+    // Velocity is negative, check top side;
+    if (t = AtPoint({x1, y1}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = ceil(y1) - y1 + kBuffer;
+    } else if (t = AtPoint({x2, y1}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = ceil(y1) - y1 + kBuffer;
+    }
+    return ci;
+  } else {
+    // Velocity is positive, check bottom side.
+    if (t = AtPoint({x1, y2}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = floor(y2) - y2 - kBuffer;
+    } else if (t = AtPoint({x2, y2}); t != TileType::NONE) {
+      ci.type = t;
+      ci.correction = floor(y2) - y2 - kBuffer;
+    }
+    return ci;
   }
 }

@@ -26,7 +26,8 @@ class TileSet {
 enum class TileType {
   NONE,
   GROUND,
-  SPIKES
+  SPIKES,
+  OOB
 };
 
 TileType TileToTileType(Tile tile);
@@ -45,12 +46,11 @@ struct TileMapObject {
 };
 
 struct CollisionInfo {
-  TileType tile;
+  TileType type;
 
-  // A vector of directions the colliding rect could move to not collide with
-  // the TileMap anymore. The caller should choose which direction to move,
-  // either is fine. The lower magnitude should probably be preferred.
-  Vec correction;
+  // A magnitude the colliding rect could move to not collide with the TileMap
+  // anymore.
+  double correction;
 };
 
 class TileMap {
@@ -60,8 +60,10 @@ class TileMap {
 
   std::vector<TileMapObject> TileMapObjects() const;
 
-  // TODO: Should this take a velocity vector as well to inform deltas?
-  CollisionInfo Collide(const Rect& rect) const;
+  CollisionInfo XCollide(const Rect& rect, double dx) const;
+  CollisionInfo YCollide(const Rect& rect, double dy) const;
+
+  TileType AtPoint(const Vec& p) const;
 
   static std::unique_ptr<TileMap> Load(const TileSet* tileset);
 
