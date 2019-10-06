@@ -2,6 +2,8 @@
 
 #include <SDL_image.h>
 
+#include "log.h"
+
 void Game::Update(double t, ButtonState buttons) {
   hero->Update(t, buttons, *tilemap);
 }
@@ -26,7 +28,21 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
   }
   game->tileset = std::make_unique<TileSet>(game->tileset_texture);
   game->tilemap = TileMap::Load(game->tileset.get());
-  game->hero = std::make_unique<Hero>(game->tileset.get(), Vec{0.1, 0.1});
+
+  Vec start{0, 0};
+  for (const TileMapObject& obj : game->tilemap->TileMapObjects()) {
+    if (obj.type == ObjectType::START) {
+      start.x = obj.location.x;
+      start.y = obj.location.y;
+    } else if (obj.type == ObjectType::BOX) {
+      game->boxes.emplace_back(Vec{obj.location.x, obj.location.y});
+    } else if (obj.type == ObjectType::EXIT) {
+    } else {
+      log("Unknown object type");
+    }
+  }
+
+  game->hero = std::make_unique<Hero>(game->tileset.get(), start);
 
   return game;
 }

@@ -1,6 +1,8 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#include <SDL.h>
+
 struct Rect {
   double x;
   double y;

@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include "log.h"
-
 const int kTileRows = 16;
 const int kTileCols = 16;
 const int kTileWidth = 16;
