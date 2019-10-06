@@ -165,6 +165,20 @@ TileType TileMap::AtPoint(const Vec& p) const {
   return TileToTileType(map[tile_y][tile_x]);
 }
 
+std::set<TileType> TileMap::CollidingWith(const Rect& rect) const {
+  double x1 = rect.x;
+  double y1 = rect.y;
+  double x2 = rect.x + rect.w;
+  double y2 = rect.y + rect.h;
+
+  return std::set<TileType>({
+      AtPoint({x1, y1}),
+      AtPoint({x1, y2 - kBuffer}),
+      AtPoint({x2 - kBuffer, y1}),
+      AtPoint({x2 - kBuffer, y2 - kBuffer}),
+  });
+}
+
 // HACK: Assume no Rect is larger than a unit square, so just check corners.
 CollisionInfo TileMap::XCollide(const Rect& rect, double dx) const {
   double x1 = rect.x + dx;

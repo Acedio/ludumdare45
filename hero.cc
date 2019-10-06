@@ -4,6 +4,7 @@
 
 const double kHorizontalVel = 5.0;
 const double kGravityAcc = 5.0;
+const double kJumpVel = -5.0;
 
 void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap) {
   if (buttons.left == buttons.right) {
@@ -14,6 +15,11 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap) {
   } else if (buttons.right) {
     facing_right = true;
     vel.x = kHorizontalVel;
+  }
+
+  if (buttons.jump && !falling) {
+    falling = true;
+    vel.y = kJumpVel;
   }
 
   double dx = t*vel.x;
@@ -29,8 +35,13 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap) {
   double dy = t*vel.y;
   if (CollisionInfo info = tilemap.YCollide(bounding_box, dy);
       info.type == TileType::NONE) {
+    falling = true;
     bounding_box.y += dy;
   } else {
+    if (info.correction < 0) {
+      // We've hit ground, so no longer falling.
+      falling = false;
+    }
     bounding_box.y += dy + info.correction;
     vel.y = 0;
   }

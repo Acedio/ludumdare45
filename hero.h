@@ -18,8 +18,7 @@ class Hero {
       : bounding_box{pos.x, pos.y, 0.8, 0.9},
         vel{0, 0},
         left(tileset, 3),
-        right(tileset, 4),
-        facing_right(true) {}
+        right(tileset, 4) {};
 
  private:
   Rect bounding_box;
@@ -29,7 +28,8 @@ class Hero {
   Sprite left;
   Sprite right;
 
-  bool facing_right;
+  bool facing_right = true;
+  bool falling = false;
 
   // ObjectType holding;
 };

@@ -2,6 +2,7 @@
 #define TILEMAP_H
 
 #include <memory>
+#include <set>
 #include <vector>
 
 #include <SDL.h>
@@ -61,6 +62,8 @@ class TileMap {
 
   std::vector<TileMapObject> TileMapObjects() const;
 
+  std::set<TileType> CollidingWith(const Rect& rect) const;
+  // TODO: Maybe pass a set of TileType to indicate what the rect cares about?
   CollisionInfo XCollide(const Rect& rect, double dx) const;
   CollisionInfo YCollide(const Rect& rect, double dy) const;
 
