@@ -8,6 +8,7 @@ const int kTileRows = 16;
 const int kTileCols = 16;
 const int kTileWidth = 16;
 const int kTileHeight = 16;
+const Tile kEmptyTile = 0;
 
 void TileSet::DrawTile(SDL_Renderer* renderer, Tile tile,
                        const SDL_Rect& dst) const {
@@ -25,12 +26,69 @@ void TileSet::DrawTile(SDL_Renderer* renderer, Tile tile,
   SDL_RenderCopy(renderer, tex, &src, &dst);
 }
 
+TileType TileToTileType(Tile tile) {
+  switch(tile) {
+    case 1:
+      return TileType::GROUND;
+    case 2:
+      return TileType::SPIKES;
+    default:
+      return TileType::NONE;
+  }
+}
+
+ObjectType TileToObjectType(Tile tile) {
+  switch(tile) {
+    case 3:
+      return ObjectType::BOX;
+    case 4:
+      return ObjectType::START;
+    case 5:
+      return ObjectType::EXIT;
+    default:
+      return ObjectType::NONE;
+  }
+}
+
+std::vector<TileMapObject> extractObjects(std::vector<std::vector<Tile>>* map) {
+  SDL_assert(map != nullptr);
+
+  std::vector<TileMapObject> objects;
+
+  Rect location;
+  location.w = 1;
+  location.h = 1;
+
+  for (int row = 0; row < map->size(); ++row) {
+    std::vector<Tile>& tilerow = (*map)[row];
+    for (int col = 0; col < tilerow.size(); ++col) {
+      ObjectType type = TileToObjectType(tilerow[col]);
+      if (type != ObjectType::NONE) {
+        // Clear the tile so it shows up empty.
+        tilerow[col] = kEmptyTile;
+
+        location.y = row;
+        location.x = col;
+
+        TileMapObject object;
+        object.type = type;
+        object.location = location;
+        objects.push_back(object);
+      }
+    }
+  }
+
+  return objects;
+}
+
 std::unique_ptr<TileMap> TileMap::Load(SDL_Texture *tileset_texture) {
   auto map = std::make_unique<TileMap>();
 
   map->tileset = std::make_unique<TileSet>(tileset_texture);
 
-  // TODO: Add validation.
+  // Test to verify that empty tiles parse as NONE.
+  SDL_assert(TileToTileType(kEmptyTile) == TileType::NONE);
+
   map->map = {
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -50,7 +108,13 @@ std::unique_ptr<TileMap> TileMap::Load(SDL_Texture *tileset_texture) {
       {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
   };
 
+  map->objects = extractObjects(&map->map);
+
   return map;
+}
+
+std::vector<TileMapObject> TileMap::TileMapObjects() const {
+  return objects;
 }
 
 void TileMap::Draw(SDL_Renderer* renderer) const {

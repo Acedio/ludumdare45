@@ -6,6 +6,8 @@
 
 #include <SDL.h>
 
+#include "geometry.h"
+
 typedef int Tile;
 
 class TileSet {
@@ -19,16 +21,52 @@ class TileSet {
   SDL_Texture* tex;
 };
 
+enum class TileType {
+  NONE,
+  GROUND,
+  SPIKES
+};
+
+TileType TileToTileType(Tile tile);
+
+enum class ObjectType {
+  NONE,
+  BOX,
+  START,
+  EXIT
+};
+
+struct TileMapObject {
+  ObjectType type;
+  // The coordinates and size of the object in tilespace.
+  Rect location;
+};
+
+struct CollisionInfo {
+  TileType tile;
+
+  // A vector of directions the colliding rect could move to not collide with
+  // the TileMap anymore. The caller should choose which direction to move,
+  // either is fine. The lower magnitude should probably be preferred.
+  Vec correction;
+};
+
 class TileMap {
  public:
   // Draw the map, no viewport.
   void Draw(SDL_Renderer* renderer) const;
+
+  std::vector<TileMapObject> TileMapObjects() const;
+
+  // TODO: Should this take a velocity vector as well to inform deltas?
+  CollisionInfo Collide(const Rect& rect) const;
 
   static std::unique_ptr<TileMap> Load(SDL_Texture* tileset_texture);
 
  private:
   std::vector<std::vector<Tile>> map;
   std::unique_ptr<TileSet> tileset;
+  std::vector<TileMapObject> objects;
 };
 
 #endif
