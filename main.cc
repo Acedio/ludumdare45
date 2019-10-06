@@ -17,7 +17,7 @@ void drawBackground(SDL_Renderer* renderer) {
 
 void gameLoop() {
   drawBackground(global_renderer);
-  drawMap(*map, global_renderer);
+  map->Draw(global_renderer);
 
   SDL_RenderPresent(global_renderer);
 }
@@ -43,7 +43,7 @@ int main() {
   if (!tileset_texture) {
     return -1;
   }
-  map = load(tileset_texture);
+  map = TileMap::Load(tileset_texture);
 
   emscripten_set_main_loop(gameLoop, -1, true);
 

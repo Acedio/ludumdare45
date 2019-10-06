@@ -8,23 +8,27 @@
 
 typedef int Tile;
 
-struct TileSet {
-  // Assumes 16x16 tiles.
+class TileSet {
+ public:
+  TileSet(SDL_Texture* tex) : tex(tex) {}
+  void DrawTile(SDL_Renderer* renderer, Tile tile,
+                const SDL_Rect& dst) const;
+
+ private:
+  // Assumes 16x16 tilemap.
   SDL_Texture* tex;
-  int tile_w;
-  int tile_h;
 };
 
-void drawTile(const TileSet& tileset, SDL_Renderer* renderer, Tile tile, int x, int y);
+class TileMap {
+ public:
+  // Draw the map, no viewport.
+  void Draw(SDL_Renderer* renderer) const;
 
-struct TileMap {
+  static std::unique_ptr<TileMap> Load(SDL_Texture* tileset_texture);
+
+ private:
   std::vector<std::vector<Tile>> map;
   std::unique_ptr<TileSet> tileset;
 };
-
-std::unique_ptr<TileMap> load(SDL_Texture* tileset_texture);
-
-// Draw the map, no viewport.
-void drawMap(const TileMap& tilemap, SDL_Renderer* renderer);
 
 #endif

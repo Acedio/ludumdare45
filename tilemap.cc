@@ -6,35 +6,29 @@
 
 const int kTileRows = 16;
 const int kTileCols = 16;
+const int kTileWidth = 16;
+const int kTileHeight = 16;
 
-void drawTile(const TileSet& tileset, SDL_Renderer* renderer, Tile tile, int x, int y) {
+void TileSet::DrawTile(SDL_Renderer* renderer, Tile tile,
+                       const SDL_Rect& dst) const {
   SDL_assert(tile >= 0 && tile < kTileRows*kTileCols);
 
   int tile_x = tile % kTileCols;
   int tile_y = tile / kTileCols;
 
   SDL_Rect src;
-  src.x = tile_x * tileset.tile_w;
-  src.y = tile_y * tileset.tile_h;
-  src.w = tileset.tile_w;
-  src.h = tileset.tile_h;
+  src.x = tile_x * kTileWidth;
+  src.y = tile_y * kTileHeight;
+  src.w = kTileWidth;
+  src.h = kTileHeight;
 
-  SDL_Rect dst;
-  dst.x = x * tileset.tile_w;
-  dst.y = y * tileset.tile_h;
-  dst.w = tileset.tile_w;
-  dst.h = tileset.tile_h;
-
-  SDL_RenderCopy(renderer, tileset.tex, &src, &dst);
+  SDL_RenderCopy(renderer, tex, &src, &dst);
 }
 
-std::unique_ptr<TileMap> load(SDL_Texture *tileset_texture) {
+std::unique_ptr<TileMap> TileMap::Load(SDL_Texture *tileset_texture) {
   auto map = std::make_unique<TileMap>();
 
-  map->tileset = std::make_unique<TileSet>();
-  map->tileset->tex = tileset_texture;
-  map->tileset->tile_w = 16;
-  map->tileset->tile_h = 16;
+  map->tileset = std::make_unique<TileSet>(tileset_texture);
 
   // TODO: Add validation.
   map->map = {
@@ -59,11 +53,17 @@ std::unique_ptr<TileMap> load(SDL_Texture *tileset_texture) {
   return map;
 }
 
-void drawMap(const TileMap& tilemap, SDL_Renderer* renderer) {
-  for (int row = 0; row < tilemap.map.size(); ++row) {
-    const std::vector<Tile>& tilerow = tilemap.map[row];
+void TileMap::Draw(SDL_Renderer* renderer) const {
+  SDL_Rect dst;
+  dst.w = kTileWidth;
+  dst.h = kTileHeight;
+
+  for (int row = 0; row < map.size(); ++row) {
+    const std::vector<Tile>& tilerow = map[row];
     for (int col = 0; col < tilerow.size(); ++col) {
-      drawTile(*tilemap.tileset, renderer, tilerow[col], col, row);
+      dst.y = row * kTileHeight;
+      dst.x = col * kTileWidth;
+      tileset->DrawTile(renderer, tilerow[col], dst);
     }
   }
 }
