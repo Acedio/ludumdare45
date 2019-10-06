@@ -1,23 +1,22 @@
 #include <memory>
 #include <SDL.h>
-#include <SDL_image.h>
 #include <emscripten.h>
 
-#include "tilemap.h"
+#include "buttons.h"
+#include "game.h"
 
 SDL_Window *global_window;
 SDL_Renderer *global_renderer;
 
-std::unique_ptr<TileMap> map;
-
-void drawBackground(SDL_Renderer* renderer) {
-  SDL_SetRenderDrawColor(renderer, 0, 128, 128, 255);
-  SDL_RenderClear(renderer);
-}
+std::unique_ptr<Game> game;
 
 void gameLoop() {
-  drawBackground(global_renderer);
-  map->Draw(global_renderer);
+  // Update game logic.
+  ButtonState buttons = GetButtonState();
+  game->Update(0 /*TODO: timesteps*/, buttons);
+
+  // Draw.
+  game->Draw(global_renderer);
 
   SDL_RenderPresent(global_renderer);
 }
@@ -37,13 +36,8 @@ int main() {
     return -1;
   }
 
-  // TODO: Set color key.
-  SDL_Texture *tileset_texture =
-      IMG_LoadTexture(global_renderer, "asset_dir/tiles.png");
-  if (!tileset_texture) {
-    return -1;
-  }
-  map = TileMap::Load(tileset_texture);
+  game = Game::Load(global_renderer);
+  SDL_assert(game != nullptr);
 
   emscripten_set_main_loop(gameLoop, -1, true);
 
