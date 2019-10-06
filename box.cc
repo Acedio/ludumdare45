@@ -18,7 +18,7 @@ void BoxManager::Update(double t, const TileMap& tilemap) {
     std::vector<Box>& column = columns[col];
     // Go from bottom to top.
     std::sort(column.begin(), column.end(),
-              [](const Box& a, const Box& b) { return a.y < b.y; });
+              [](const Box& a, const Box& b) { return a.y > b.y; });
     for (int i = 0; i < column.size(); ++i) {
       Box& box = column[i];
       if (!box.stopped) {
@@ -26,13 +26,20 @@ void BoxManager::Update(double t, const TileMap& tilemap) {
         // Boxes should only fall.
         SDL_assert(box.y_vel >= 0);
         double dy = t*box.y_vel;
-        if (CollisionInfo info = tilemap.YCollide(ToBoundingBox(col, box), dy);
-            info.type == TileType::NONE) {
-          box.y += dy;
-        } else {
+        if (i > 0 && box.y + kSize >= column[i - 1].y) {
+          // Collided with below box.
+          box.stopped = true;
+          box.y = column[i-1].y - kSize;
+          box.y_vel = 0;
+        } else if (CollisionInfo info =
+                       tilemap.YCollide(ToBoundingBox(col, box), dy);
+                   info.type != TileType::NONE) {
+          // Collided with tilemap.
           box.stopped = true;
           box.y += dy + info.correction;
           box.y_vel = 0;
+        } else {
+          box.y += dy;
         }
       }
     }
