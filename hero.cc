@@ -17,8 +17,8 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap) {
   }
 
   double dx = t*vel.x;
-  CollisionInfo info = tilemap.XCollide(bounding_box, dx);
-  if (info.type != TileType::GROUND) {
+  if (CollisionInfo info = tilemap.XCollide(bounding_box, dx);
+      info.type == TileType::NONE) {
     bounding_box.x += dx;
   } else {
     bounding_box.x += dx + info.correction;
@@ -27,8 +27,8 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap) {
 
   vel.y += t*kGravityAcc;
   double dy = t*vel.y;
-  info = tilemap.YCollide(bounding_box, dy);
-  if (info.type != TileType::GROUND) {
+  if (CollisionInfo info = tilemap.YCollide(bounding_box, dy);
+      info.type == TileType::NONE) {
     bounding_box.y += dy;
   } else {
     bounding_box.y += dy + info.correction;

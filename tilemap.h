@@ -30,6 +30,7 @@ enum class TileType {
   OOB
 };
 
+const char* ToString(TileType type);
 TileType TileToTileType(Tile tile);
 
 enum class ObjectType {

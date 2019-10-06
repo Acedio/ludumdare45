@@ -19,8 +19,7 @@ class Hero {
         vel{0, 0},
         left(tileset, 3),
         right(tileset, 4),
-        facing_right(true),
-        holding(ObjectType::NONE) {}
+        facing_right(true) {}
 
  private:
   Rect bounding_box;
@@ -32,7 +31,7 @@ class Hero {
 
   bool facing_right;
 
-  ObjectType holding;
+  // ObjectType holding;
 };
 
 #endif
