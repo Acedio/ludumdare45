@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-const double kHorizontalVel = 5.0;
-const double kGravityAcc = 5.0;
-const double kJumpVel = -5.0;
+const double kHorizontalVel = 7.0;
+const double kGravityAcc = 20.0;
+const double kJumpVel = -15.0;
 
 void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap) {
   if (buttons.left == buttons.right) {

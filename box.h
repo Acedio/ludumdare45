@@ -3,15 +3,26 @@
 
 #include "geometry.h"
 #include "tilemap.h"
+#include "sprite.h"
 
-class Box {
+struct Box {
+  // Boxes only move up and down.
+  double y;
+  double y_vel;
+  bool stopped;
+};
+
+class BoxManager {
  public:
-  Box(Vec pos) : pos{pos.x, pos.y, 1, 1}, vel{0, 0} {}
+  BoxManager(TileSet* tileset, int cols) : columns(cols), sprite(tileset, 3) {}
+
+  // Round x to make sure that we don't skip into the wrong col.
+  void Add(Vec pos);
   void Update(double t, const TileMap& tilemap);
   void Draw(SDL_Renderer* renderer) const;
  private:
-  Rect pos;
-  Vec vel;
+  std::vector<std::vector<Box>> columns;
+  Sprite sprite;
 };
 
 #endif

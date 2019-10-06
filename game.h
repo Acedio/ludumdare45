@@ -20,7 +20,7 @@ class Game {
   std::unique_ptr<TileSet> tileset;
   std::unique_ptr<TileMap> tilemap;
   std::unique_ptr<Hero> hero;
-  std::vector<Box> boxes;
+  std::unique_ptr<BoxManager> boxes;
   // Owned.
   SDL_Texture* tileset_texture;
 };

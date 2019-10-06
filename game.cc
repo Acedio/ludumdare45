@@ -6,6 +6,7 @@
 
 void Game::Update(double t, ButtonState buttons) {
   hero->Update(t, buttons, *tilemap);
+  boxes->Update(t, *tilemap);
 }
 
 void drawBackground(SDL_Renderer* renderer) {
@@ -16,6 +17,7 @@ void drawBackground(SDL_Renderer* renderer) {
 void Game::Draw(SDL_Renderer* renderer) const {
   drawBackground(renderer);
   tilemap->Draw(renderer);
+  boxes->Draw(renderer);
   hero->Draw(renderer);
 }
 
@@ -28,6 +30,8 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
   }
   game->tileset = std::make_unique<TileSet>(game->tileset_texture);
   game->tilemap = TileMap::Load(game->tileset.get());
+  game->boxes = std::make_unique<BoxManager>(
+      game->tileset.get(), /*TODO: detect number of columns*/ 100);
 
   Vec start{0, 0};
   for (const TileMapObject& obj : game->tilemap->TileMapObjects()) {
@@ -35,7 +39,7 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
       start.x = obj.location.x;
       start.y = obj.location.y;
     } else if (obj.type == ObjectType::BOX) {
-      game->boxes.emplace_back(Vec{obj.location.x, obj.location.y});
+      game->boxes->Add(Vec{obj.location.x, obj.location.y});
     } else if (obj.type == ObjectType::EXIT) {
     } else {
       log("Unknown object type");
