@@ -8,6 +8,8 @@
 
 #include "geometry.h"
 
+SDL_Rect ToSDLRect(const Rect& rect);
+
 typedef int Tile;
 
 class TileSet {
@@ -61,11 +63,11 @@ class TileMap {
   // TODO: Should this take a velocity vector as well to inform deltas?
   CollisionInfo Collide(const Rect& rect) const;
 
-  static std::unique_ptr<TileMap> Load(SDL_Texture* tileset_texture);
+  static std::unique_ptr<TileMap> Load(const TileSet* tileset);
 
  private:
   std::vector<std::vector<Tile>> map;
-  std::unique_ptr<TileSet> tileset;
+  const TileSet* tileset;
   std::vector<TileMapObject> objects;
 };
 

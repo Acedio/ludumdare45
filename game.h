@@ -3,6 +3,7 @@
 
 #include "tilemap.h"
 #include "buttons.h"
+#include "hero.h"
 
 class Game {
  public:
@@ -15,7 +16,9 @@ class Game {
  private:
   Game() {}
 
+  std::unique_ptr<TileSet> tileset;
   std::unique_ptr<TileMap> tilemap;
+  std::unique_ptr<Hero> hero;
   // Owned.
   SDL_Texture* tileset_texture;
 };

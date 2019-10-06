@@ -10,6 +10,15 @@ const int kTileWidth = 16;
 const int kTileHeight = 16;
 const Tile kEmptyTile = 0;
 
+SDL_Rect ToSDLRect(const Rect& rect) {
+  SDL_Rect sr;
+  sr.x = rect.x * kTileWidth;
+  sr.y = rect.y * kTileHeight;
+  sr.w = kTileWidth;
+  sr.h = kTileHeight;
+  return sr;
+}
+
 void TileSet::DrawTile(SDL_Renderer* renderer, Tile tile,
                        const SDL_Rect& dst) const {
   SDL_assert(tile >= 0 && tile < kTileRows*kTileCols);
@@ -81,10 +90,10 @@ std::vector<TileMapObject> extractObjects(std::vector<std::vector<Tile>>* map) {
   return objects;
 }
 
-std::unique_ptr<TileMap> TileMap::Load(SDL_Texture *tileset_texture) {
+std::unique_ptr<TileMap> TileMap::Load(const TileSet* tileset) {
   auto map = std::make_unique<TileMap>();
 
-  map->tileset = std::make_unique<TileSet>(tileset_texture);
+  map->tileset = tileset;
 
   // Test to verify that empty tiles parse as NONE.
   SDL_assert(TileToTileType(kEmptyTile) == TileType::NONE);

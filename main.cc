@@ -10,10 +10,12 @@ SDL_Renderer *global_renderer;
 
 std::unique_ptr<Game> game;
 
+const double kTimestep = 1.0/60.0;
+
 void gameLoop() {
   // Update game logic.
   ButtonState buttons = GetButtonState();
-  game->Update(0 /*TODO: timesteps*/, buttons);
+  game->Update(kTimestep, buttons);
 
   // Draw.
   game->Draw(global_renderer);

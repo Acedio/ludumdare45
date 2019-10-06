@@ -13,4 +13,6 @@ struct Vec {
   double y;
 };
 
+SDL_Rect ToSDLRect(const Rect& rect);
+
 #endif

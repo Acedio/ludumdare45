@@ -3,6 +3,7 @@
 #include <SDL_image.h>
 
 void Game::Update(double t, ButtonState buttons) {
+  hero->Update(t, buttons);
 }
 
 void drawBackground(SDL_Renderer* renderer) {
@@ -13,6 +14,7 @@ void drawBackground(SDL_Renderer* renderer) {
 void Game::Draw(SDL_Renderer* renderer) const {
   drawBackground(renderer);
   tilemap->Draw(renderer);
+  hero->Draw(renderer);
 }
 
 std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
@@ -22,7 +24,9 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
   if (!game->tileset_texture) {
     return nullptr;
   }
-  game->tilemap = TileMap::Load(game->tileset_texture);
+  game->tileset = std::make_unique<TileSet>(game->tileset_texture);
+  game->tilemap = TileMap::Load(game->tileset.get());
+  game->hero = std::make_unique<Hero>(game->tileset.get(), Vec{0, 0});
 
   return game;
 }
