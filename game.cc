@@ -5,7 +5,7 @@
 #include "log.h"
 
 void Game::Update(double t, ButtonState buttons) {
-  hero->Update(t, buttons, *tilemap, *boxes);
+  hero->Update(t, buttons, *tilemap, boxes.get());
   boxes->Update(t, *tilemap);
 }
 

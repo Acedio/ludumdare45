@@ -1,5 +1,8 @@
 #include "box.h"
 
+#include <cmath>
+#include <iostream>
+
 const double kGravityAcc = 5.0;
 const double kSize = 1;
 const double kBuffer = 0.001;
@@ -7,7 +10,7 @@ const double kBuffer = 0.001;
 void BoxManager::Add(Vec pos) {
   int col = pos.x + 0.5;
   SDL_assert(col >= 0 && col < columns.size());
-  columns[col].push_back({pos.y, 0, false});
+  columns[col].push_back({floor(pos.y + 0.5)});
   std::sort(columns[col].begin(), columns[col].end(),
             [](const Box& a, const Box& b) { return a.y > b.y; });
 }
@@ -31,6 +34,9 @@ void BoxManager::Update(double t, const TileMap& tilemap) {
         double dy = t*box.y_vel;
         if (i > 0 && box.y + kSize >= column[i - 1].y) {
           // Collided with below box.
+          if (column[i - 1].stopped) {
+            column[i - 1].stacked_on = true;
+          }
           box.stopped = true;
           box.y = column[i-1].y - kSize;
           box.y_vel = 0;
@@ -75,6 +81,36 @@ bool BoxManager::AtPoint(Vec p) const {
     }
   }
   return false;
+}
+
+BoxType BoxManager::GrabAt(Vec pos) {
+  int col = (int)pos.x;
+  if (col < 0 || col >= columns.size()) {
+    return BoxType::NONE;
+  }
+  // Should always be sorted, go from bottom to top.
+  for (int i = 0; i < columns[col].size(); ++i) {
+    Box& box = columns[col][i];
+    if (pos.y >= box.y + kSize) {
+      // We're below the box, and boxes will only get higher.
+      return BoxType::NONE;
+    }
+    // TODO: This seems brittle :P
+    std::cout << "stopped: " << box.stopped << " stacked_on: " << box.stacked_on
+              << std::endl;
+    if (pos.y >= box.y && box.stopped && !box.stacked_on) {
+      // There is indeed a box to grab.
+      if (i > 0) {
+        // Unstacked_on the below box if needed.
+        columns[col][i-1].stacked_on = false;
+      }
+      std::cout << "Grabbed!" << std::endl;
+      BoxType type = box.type;
+      columns[col].erase(columns[col].begin() + i);
+      return type;
+    }
+  }
+  return BoxType::NONE;
 }
 
 std::optional<double> BoxManager::XCollide(const Rect& rect, double dx) const {

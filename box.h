@@ -7,11 +7,19 @@
 #include "tilemap.h"
 #include "sprite.h"
 
+enum class BoxType {
+  NONE,
+  BOX,
+};
+
 struct Box {
   // Boxes only move up and down.
   double y;
-  double y_vel;
-  bool stopped;
+  double y_vel = 0;
+  bool stopped = false;
+  // There is a box on top of this one.
+  bool stacked_on = false;
+  BoxType type = BoxType::BOX;
 };
 
 class BoxManager {
@@ -22,6 +30,8 @@ class BoxManager {
   void Add(Vec pos);
   void Update(double t, const TileMap& tilemap);
   void Draw(SDL_Renderer* renderer) const;
+
+  BoxType GrabAt(Vec pos);
 
   std::optional<double> XCollide(const Rect& rect, double dx) const;
   std::optional<double> YCollide(const Rect& rect, double dy) const;

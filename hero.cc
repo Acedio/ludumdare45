@@ -5,6 +5,7 @@
 const double kHorizontalVel = 7.0;
 const double kGravityAcc = 20.0;
 const double kJumpVel = -15.0;
+const double kGrabReach = 0.3;
 
 const char* ToString(JumpState j) {
   switch(j) {
@@ -15,8 +16,40 @@ const char* ToString(JumpState j) {
   }
 }
 
+void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
+                      BoxManager* boxes) {
+  SDL_assert(boxes);
+
+  if (grab_state == GrabState::RECOVERING && !buttons.grab) {
+    grab_state = GrabState::CAN_GRAB;
+  } else if (grab_state == GrabState::CAN_GRAB && buttons.grab) {
+    std::cout << "Attempting to grab." << std::endl;
+    // try to grab a thing.
+    if (jump_state == JumpState::FALLING) {
+      // Can't grab while jumping.
+      return;
+    }
+    holding = boxes->GrabAt(
+        Vec{facing_right ? bounding_box.x + bounding_box.w + kGrabReach
+                         : bounding_box.x - kGrabReach,
+            bounding_box.y + bounding_box.h / 2.0});
+    if (holding == BoxType::NONE) {
+      grab_state = GrabState::RECOVERING;
+    } else {
+      grab_state = GrabState::GRABBING;
+    }
+  } else if (grab_state == GrabState::GRABBING && !buttons.grab) {
+    grab_state = GrabState::CAN_RELEASE;
+  } else if (grab_state == GrabState::CAN_RELEASE && buttons.grab) {
+    // release the thing.
+  }
+}
+
 void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
-                  const BoxManager& boxes) {
+                  BoxManager* boxes) {
+  SDL_assert(boxes);
+
+  // MOVEMENT
   if (buttons.left == buttons.right) {
     vel.x = 0;
   } else if (buttons.left) {
@@ -36,7 +69,7 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
   }
 
   double dx = t*vel.x;
-  if (auto maybe_correction = boxes.XCollide(bounding_box, dx);
+  if (auto maybe_correction = boxes->XCollide(bounding_box, dx);
       maybe_correction) {
     // TODO: What if a box collision response yields a tilemap collision?
     // Currently giving tilemap priority.
@@ -55,7 +88,7 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
 
   vel.y += t*kGravityAcc;
   double dy = t*vel.y;
-  auto y_correction = boxes.YCollide(bounding_box, dy);
+  auto y_correction = boxes->YCollide(bounding_box, dy);
   if (y_correction) {
     if (jump_state == JumpState::FALLING) {
       // Hit a box. If we were previously falling (i.e. not already on the box),
@@ -82,6 +115,8 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
     bounding_box.y += dy + info.correction;
     vel.y = 0;
   }
+
+  UpdateGrab(buttons, tilemap, boxes);
 }
 
 void Hero::Draw(SDL_Renderer* renderer) const {

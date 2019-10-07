@@ -15,10 +15,18 @@ enum class JumpState {
   FALLING,
 };
 
+enum class GrabState {
+  RECOVERING,
+  CAN_GRAB,
+  // Grabbed something and haven't released grab yet.
+  GRABBING,
+  CAN_RELEASE,
+};
+
 class Hero {
  public:
-  void Update(double t, ButtonState buttons, const TileMap& tilemap, const
-              BoxManager& boxes);
+  void Update(double t, ButtonState buttons, const TileMap& tilemap,
+              BoxManager* boxes);
   void Draw(SDL_Renderer* renderer) const;
 
   Hero(const TileSet* tileset, Vec pos)
@@ -28,6 +36,9 @@ class Hero {
         right(tileset, 4) {};
 
  private:
+  void UpdateGrab(ButtonState buttons, const TileMap& tilemap,
+                  BoxManager* boxes);
+
   Rect bounding_box;
   // Tiles/sec
   Vec vel;
@@ -38,7 +49,8 @@ class Hero {
   bool facing_right = true;
   JumpState jump_state = JumpState::RECOVERING;
 
-  // ObjectType holding;
+  GrabState grab_state = GrabState::RECOVERING;
+  BoxType holding;
 };
 
 #endif
