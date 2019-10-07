@@ -1,6 +1,8 @@
 #ifndef BOX_H
 #define BOX_H
 
+#include <optional>
+
 #include "geometry.h"
 #include "tilemap.h"
 #include "sprite.h"
@@ -20,7 +22,14 @@ class BoxManager {
   void Add(Vec pos);
   void Update(double t, const TileMap& tilemap);
   void Draw(SDL_Renderer* renderer) const;
+
+  std::optional<double> XCollide(const Rect& rect, double dx) const;
+  std::optional<double> YCollide(const Rect& rect, double dy) const;
+
  private:
+  bool AtPoint(Vec pos) const;
+
+  // Each column should be sorted from bottom (largest Y) to top.
   std::vector<std::vector<Box>> columns;
   Sprite sprite;
 };

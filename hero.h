@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 
+#include "box.h"
 #include "buttons.h"
 #include "geometry.h"
 #include "sprite.h"
@@ -10,8 +11,8 @@
 
 class Hero {
  public:
-  // Should this take a const TileMap&?
-  void Update(double t, ButtonState buttons, const TileMap& tilemap);
+  void Update(double t, ButtonState buttons, const TileMap& tilemap, const
+              BoxManager& boxes);
   void Draw(SDL_Renderer* renderer) const;
 
   Hero(const TileSet* tileset, Vec pos)

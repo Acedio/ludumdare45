@@ -2,11 +2,14 @@
 
 const double kGravityAcc = 5.0;
 const double kSize = 1;
+const double kBuffer = 0.001;
 
 void BoxManager::Add(Vec pos) {
   int col = pos.x + 0.5;
   SDL_assert(col >= 0 && col < columns.size());
   columns[col].push_back({pos.y, 0, false});
+  std::sort(columns[col].begin(), columns[col].end(),
+            [](const Box& a, const Box& b) { return a.y > b.y; });
 }
 
 Rect ToBoundingBox(int col, const Box& box) {
@@ -52,5 +55,74 @@ void BoxManager::Draw(SDL_Renderer* renderer) const {
       SDL_Rect dst = ToSDLRect(ToBoundingBox(col, box));
       sprite.Draw(renderer, dst);
     }
+  }
+}
+
+bool BoxManager::AtPoint(Vec p) const {
+  int col = (int)p.x;
+  if (col < 0 || col >= columns.size()) {
+    return false;
+  }
+  // Should always be sorted, go from bottom to top.
+  for (const Box& box : columns[col]) {
+    if (p.y < box.y) {
+      // We're above the top box, no collision.
+      return false;
+    }
+    if (p.y < box.y + kSize) {
+      // Between the top and bottom of the box, collision.
+      return true;
+    }
+  }
+  return false;
+}
+
+std::optional<double> BoxManager::XCollide(const Rect& rect, double dx) const {
+  double x1 = rect.x + dx;
+  double y1 = rect.y;
+  double x2 = rect.x + rect.w + dx;
+  double y2 = rect.y + rect.h;
+
+  if (dx <= 0) {
+    // Velocity is negative, check left side.
+    if (AtPoint({x1, y1})) {
+      return ceil(x1) - x1;
+    } else if (AtPoint({x1, y2 - kBuffer})) {
+      return ceil(x1) - x1;
+    }
+    return std::nullopt;
+  } else {
+    // Velocity is positive, check right side.
+    if (AtPoint({x2 - kBuffer, y1})) {
+      return floor(x2) - x2;
+    } else if (AtPoint({x2 - kBuffer, y2 - kBuffer})) {
+      return floor(x2) - x2;
+    }
+    return std::nullopt;
+  }
+}
+
+std::optional<double> BoxManager::YCollide(const Rect& rect, double dy) const {
+  double x1 = rect.x;
+  double y1 = rect.y + dy;
+  double x2 = rect.x + rect.w;
+  double y2 = rect.y + rect.h + dy;
+
+  if (dy <= 0) {
+    // Velocity is negative, check top side;
+    if (AtPoint({x1, y1})) {
+      return ceil(y1) - y1;
+    } else if (AtPoint({x2 - kBuffer, y1})) {
+      return ceil(y1) - y1;
+    }
+    return std::nullopt;
+  } else {
+    // Velocity is positive, check bottom side.
+    if (AtPoint({x1, y2 - kBuffer})) {
+      return floor(y2) - y2;
+    } else if (AtPoint({x2 - kBuffer, y2 - kBuffer})) {
+      return floor(y2) - y2;
+    }
+    return std::nullopt;
   }
 }
