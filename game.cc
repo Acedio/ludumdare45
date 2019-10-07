@@ -17,7 +17,7 @@ void Game::Update(double t, ButtonState buttons) {
 }
 
 void drawBackground(SDL_Renderer* renderer) {
-  SDL_SetRenderDrawColor(renderer, 0, 128, 128, 255);
+  SDL_SetRenderDrawColor(renderer, 0, 131, 233, 235);
   SDL_RenderClear(renderer);
 }
 
