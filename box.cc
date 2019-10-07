@@ -15,7 +15,7 @@ void BoxManager::Add(Vec pos) {
             [](const Box& a, const Box& b) { return a.y > b.y; });
 }
 
-bool BoxManager::TryAdd(Vec pos, BoxType type) {
+bool BoxManager::TryAdd(Vec pos, GrabbedBox box) {
   return false;
 }
 
@@ -87,17 +87,17 @@ bool BoxManager::AtPoint(Vec p) const {
   return false;
 }
 
-BoxType BoxManager::GrabAt(Vec pos) {
+std::optional<GrabbedBox> BoxManager::GrabAt(Vec pos) {
   int col = (int)pos.x;
   if (col < 0 || col >= columns.size()) {
-    return BoxType::NONE;
+    return std::nullopt;
   }
   // Should always be sorted, go from bottom to top.
   for (int i = 0; i < columns[col].size(); ++i) {
     Box& box = columns[col][i];
     if (pos.y >= box.y + kSize) {
       // We're below the box, and boxes will only get higher.
-      return BoxType::NONE;
+      return std::nullopt;
     }
     // TODO: This seems brittle :P
     std::cout << "stopped: " << box.stopped << " stacked_on: " << box.stacked_on
@@ -109,12 +109,12 @@ BoxType BoxManager::GrabAt(Vec pos) {
         columns[col][i-1].stacked_on = false;
       }
       std::cout << "Grabbed!" << std::endl;
-      BoxType type = box.type;
+      GrabbedBox grabbed{box.type, sprite};
       columns[col].erase(columns[col].begin() + i);
-      return type;
+      return grabbed;
     }
   }
-  return BoxType::NONE;
+  return std::nullopt;
 }
 
 std::optional<double> BoxManager::XCollide(const Rect& rect, double dx) const {

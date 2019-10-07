@@ -32,8 +32,8 @@ class Hero {
   Hero(const TileSet* tileset, Vec pos)
       : bounding_box{pos.x, pos.y, 0.8, 0.9},
         vel{0, 0},
-        left(tileset, 3),
-        right(tileset, 4) {};
+        left(tileset, 4),
+        right(tileset, 5) {};
 
  private:
   void UpdateGrab(ButtonState buttons, const TileMap& tilemap,
@@ -51,7 +51,7 @@ class Hero {
   JumpState jump_state = JumpState::RECOVERING;
 
   GrabState grab_state = GrabState::RECOVERING;
-  BoxType holding = BoxType::NONE;
+  std::optional<GrabbedBox> holding;
 };
 
 #endif

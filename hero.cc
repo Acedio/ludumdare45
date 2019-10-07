@@ -44,7 +44,7 @@ void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
         Vec{facing_right ? bounding_box.x + bounding_box.w + kGrabReach
                          : bounding_box.x - kGrabReach,
             bounding_box.y + bounding_box.h / 2.0});
-    if (holding == BoxType::NONE) {
+    if (!holding) {
       grab_state = GrabState::RECOVERING;
     } else {
       grab_state = GrabState::GRABBING;
@@ -57,8 +57,9 @@ void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
       grab_state = GrabState::GRABBING;
       return;
     }
-    if (boxes->TryAdd(HeldUpperLeft(), holding)) {
-      holding = BoxType::NONE;
+    SDL_assert(holding);
+    if (boxes->TryAdd(HeldUpperLeft(), holding.value())) {
+      holding = std::nullopt;
       grab_state = GrabState::RECOVERING;
     }
   }
@@ -149,9 +150,9 @@ void Hero::Draw(SDL_Renderer* renderer) const {
   } else {
     left.Draw(renderer, dst);
   }
-  if (holding != BoxType::NONE) {
+  if (holding) {
     Vec upper_left = HeldUpperLeft();
     Rect box_sprite_box{upper_left.x, upper_left.y, 1, 1};
-    left.Draw(renderer, ToSDLRect(box_sprite_box));
+    holding->sprite.Draw(renderer, ToSDLRect(box_sprite_box));
   }
 }

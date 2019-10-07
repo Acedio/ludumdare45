@@ -11,6 +11,7 @@ class Sprite {
  private:
   const TileSet* tileset;  // Not owned.
   Tile tile;
+  // TODO: Should probably also have a w and h;
 };
 
 #endif

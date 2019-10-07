@@ -8,8 +8,12 @@
 #include "sprite.h"
 
 enum class BoxType {
-  NONE,
   BOX,
+};
+
+struct GrabbedBox {
+  BoxType type;
+  Sprite sprite;
 };
 
 struct Box {
@@ -28,11 +32,11 @@ class BoxManager {
 
   // Round x to make sure that we don't skip into the wrong col.
   void Add(Vec pos);
-  bool TryAdd(Vec pos, BoxType type);
+  bool TryAdd(Vec pos, GrabbedBox box);
   void Update(double t, const TileMap& tilemap);
   void Draw(SDL_Renderer* renderer) const;
 
-  BoxType GrabAt(Vec pos);
+  std::optional<GrabbedBox> GrabAt(Vec pos);
 
   std::optional<double> XCollide(const Rect& rect, double dx) const;
   std::optional<double> YCollide(const Rect& rect, double dy) const;
