@@ -15,8 +15,20 @@ void BoxManager::Add(Vec pos) {
             [](const Box& a, const Box& b) { return a.y > b.y; });
 }
 
-bool BoxManager::TryAdd(Vec pos, GrabbedBox box) {
-  return false;
+bool BoxManager::TryAdd(Vec upper_left, GrabbedBox box) {
+  // std::optional<double> BoxManager::YCollide(const Rect& rect, double dy) const {
+  Rect pos;
+  pos.x = floor(upper_left.x + 0.5);
+  pos.y = upper_left.y;
+  pos.w = 1;
+  pos.h = 1;
+
+  auto maybe_correction = YCollide(pos, 0);
+  if (maybe_correction) {
+    return false;
+  }
+  Add(upper_left);
+  return true;
 }
 
 Rect ToBoundingBox(int col, const Box& box) {
@@ -155,14 +167,15 @@ std::optional<double> BoxManager::YCollide(const Rect& rect, double dy) const {
     } else if (AtPoint({x2 - kBuffer, y1})) {
       return ceil(y1) - y1;
     }
-    return std::nullopt;
-  } else {
+  }
+  // Both arms need to execute for TryAdd().
+  if (dy >= 0) {
     // Velocity is positive, check bottom side.
     if (AtPoint({x1, y2 - kBuffer})) {
       return floor(y2) - y2;
     } else if (AtPoint({x2 - kBuffer, y2 - kBuffer})) {
       return floor(y2) - y2;
     }
-    return std::nullopt;
   }
+  return std::nullopt;
 }

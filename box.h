@@ -32,7 +32,7 @@ class BoxManager {
 
   // Round x to make sure that we don't skip into the wrong col.
   void Add(Vec pos);
-  bool TryAdd(Vec pos, GrabbedBox box);
+  bool TryAdd(Vec upper_left, GrabbedBox box);
   void Update(double t, const TileMap& tilemap);
   void Draw(SDL_Renderer* renderer) const;
 
