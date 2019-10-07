@@ -16,6 +16,17 @@ const char* ToString(JumpState j) {
   }
 }
 
+Vec Hero::HeldUpperLeft() const {
+  // Y is weird because we need to remove the sprite offset to get the box to
+  // match up, height-wise. See the Draw() function.
+  double y = bounding_box.y - (1 - bounding_box.h);
+  if (facing_right) {
+    return Vec{bounding_box.x + bounding_box.w, y};
+  } else {
+    return Vec{bounding_box.x - 1, y};
+  }
+}
+
 void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
                       BoxManager* boxes) {
   SDL_assert(boxes);
@@ -41,7 +52,15 @@ void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
   } else if (grab_state == GrabState::GRABBING && !buttons.grab) {
     grab_state = GrabState::CAN_RELEASE;
   } else if (grab_state == GrabState::CAN_RELEASE && buttons.grab) {
-    // release the thing.
+    if (jump_state == JumpState::FALLING) {
+      // Must release grab button before trying to release again.
+      grab_state = GrabState::GRABBING;
+      return;
+    }
+    if (boxes->TryAdd(HeldUpperLeft(), holding)) {
+      holding = BoxType::NONE;
+      grab_state = GrabState::RECOVERING;
+    }
   }
 }
 
@@ -120,14 +139,19 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
 }
 
 void Hero::Draw(SDL_Renderer* renderer) const {
-  Rect sprite_box = bounding_box;
-  // Offset the sprite because its bouding box is not a unit rectangle.
-  sprite_box.x -= (1 - bounding_box.w)/2;
-  sprite_box.y -= 1 - bounding_box.h;
+  // The sprite is a unit square that should be bottom aligned and horizontally
+  // centered around the bounding_box.
+  Rect sprite_box{bounding_box.x - (1 - bounding_box.w) / 2,
+                  bounding_box.y - (1 - bounding_box.h), 1, 1};
   SDL_Rect dst = ToSDLRect(sprite_box);
   if (facing_right) {
     right.Draw(renderer, dst);
   } else {
     left.Draw(renderer, dst);
+  }
+  if (holding != BoxType::NONE) {
+    Vec upper_left = HeldUpperLeft();
+    Rect box_sprite_box{upper_left.x, upper_left.y, 1, 1};
+    left.Draw(renderer, ToSDLRect(box_sprite_box));
   }
 }

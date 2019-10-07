@@ -15,6 +15,10 @@ void BoxManager::Add(Vec pos) {
             [](const Box& a, const Box& b) { return a.y > b.y; });
 }
 
+bool BoxManager::TryAdd(Vec pos, BoxType type) {
+  return false;
+}
+
 Rect ToBoundingBox(int col, const Box& box) {
   return Rect{float(col), box.y, kSize, kSize};
 }

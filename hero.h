@@ -38,6 +38,7 @@ class Hero {
  private:
   void UpdateGrab(ButtonState buttons, const TileMap& tilemap,
                   BoxManager* boxes);
+  Vec HeldUpperLeft() const;
 
   Rect bounding_box;
   // Tiles/sec
@@ -50,7 +51,7 @@ class Hero {
   JumpState jump_state = JumpState::RECOVERING;
 
   GrabState grab_state = GrabState::RECOVERING;
-  BoxType holding;
+  BoxType holding = BoxType::NONE;
 };
 
 #endif
