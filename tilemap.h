@@ -34,7 +34,7 @@ enum class TileType {
 const char* ToString(TileType type);
 TileType TileToTileType(Tile tile);
 
-enum class ObjectType {
+enum class TileMapObjectType {
   NONE,
   BOX,
   START,
@@ -42,7 +42,7 @@ enum class ObjectType {
 };
 
 struct TileMapObject {
-  ObjectType type;
+  TileMapObjectType type;
   // The coordinates and size of the object in tilespace.
   Rect location;
 };

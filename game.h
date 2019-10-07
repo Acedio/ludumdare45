@@ -4,6 +4,7 @@
 #include "box.h"
 #include "buttons.h"
 #include "hero.h"
+#include "object.h"
 #include "tilemap.h"
 
 class Game {
@@ -21,6 +22,7 @@ class Game {
   std::unique_ptr<TileMap> tilemap;
   std::unique_ptr<Hero> hero;
   std::unique_ptr<BoxManager> boxes;
+  std::unique_ptr<ObjectManager> objects;
   // Owned.
   SDL_Texture* tileset_texture;
 };

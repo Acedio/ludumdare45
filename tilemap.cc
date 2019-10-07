@@ -56,16 +56,16 @@ TileType TileToTileType(Tile tile) {
   }
 }
 
-ObjectType TileToObjectType(Tile tile) {
+TileMapObjectType TileToTileMapObjectType(Tile tile) {
   switch(tile) {
     case 3:
-      return ObjectType::BOX;
+      return TileMapObjectType::BOX;
     case 4:
-      return ObjectType::START;
+      return TileMapObjectType::START;
     case 5:
-      return ObjectType::EXIT;
+      return TileMapObjectType::EXIT;
     default:
-      return ObjectType::NONE;
+      return TileMapObjectType::NONE;
   }
 }
 
@@ -81,8 +81,8 @@ std::vector<TileMapObject> extractObjects(std::vector<std::vector<Tile>>* map) {
   for (int row = 0; row < map->size(); ++row) {
     std::vector<Tile>& tilerow = (*map)[row];
     for (int col = 0; col < tilerow.size(); ++col) {
-      ObjectType type = TileToObjectType(tilerow[col]);
-      if (type != ObjectType::NONE) {
+      TileMapObjectType type = TileToTileMapObjectType(tilerow[col]);
+      if (type != TileMapObjectType::NONE) {
         // Clear the tile so it shows up empty.
         tilerow[col] = kEmptyTile;
 
