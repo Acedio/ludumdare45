@@ -65,11 +65,11 @@ bool BoxManager::AtPoint(Vec p) const {
   }
   // Should always be sorted, go from bottom to top.
   for (const Box& box : columns[col]) {
-    if (p.y < box.y) {
-      // We're above the top box, no collision.
+    if (p.y >= box.y + kSize) {
+      // We're below the box, and boxes will only get higher.
       return false;
     }
-    if (p.y < box.y + kSize) {
+    if (p.y >= box.y) {
       // Between the top and bottom of the box, collision.
       return true;
     }
