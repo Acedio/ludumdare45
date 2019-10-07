@@ -48,7 +48,7 @@ struct TileMapObject {
 };
 
 struct CollisionInfo {
-  TileType type;
+  std::set<TileType> types;
 
   // A magnitude the colliding rect could move to not collide with the TileMap
   // anymore.

@@ -4,6 +4,7 @@
 enum class EventType {
   NONE,
   WIN,
+  DIE,
 };
 
 struct Event {

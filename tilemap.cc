@@ -269,31 +269,31 @@ CollisionInfo TileMap::XCollide(const Rect& rect, double dx) const {
   double x2 = rect.x + rect.w + dx;
   double y2 = rect.y + rect.h;
 
-  CollisionInfo ci{TileType::NONE, 0};
+  CollisionInfo ci{{}, 0};
   TileType t = TileType::NONE;
 
   if (dx <= 0) {
     // Velocity is negative, check left side.
-    // TODO: If you hit both GROUND and SPIKES, probably just return GROUND.
     if (t = AtPoint({x1, y1}); t != TileType::NONE) {
-      ci.type = t;
+      ci.types.insert(t);
       ci.correction = ceil(x1) - x1;
-    } else if (t = AtPoint({x1, y2 - kBuffer}); t != TileType::NONE) {
-      ci.type = t;
+    } 
+    if (t = AtPoint({x1, y2 - kBuffer}); t != TileType::NONE) {
+      ci.types.insert(t);
       ci.correction = ceil(x1) - x1;
     }
-    return ci;
   } else {
     // Velocity is positive, check right side.
     if (t = AtPoint({x2 - kBuffer, y1}); t != TileType::NONE) {
-      ci.type = t;
-      ci.correction = floor(x2) - x2;
-    } else if (t = AtPoint({x2 - kBuffer, y2 - kBuffer}); t != TileType::NONE) {
-      ci.type = t;
+      ci.types.insert(t);
       ci.correction = floor(x2) - x2;
     }
-    return ci;
+    if (t = AtPoint({x2 - kBuffer, y2 - kBuffer}); t != TileType::NONE) {
+      ci.types.insert(t);
+      ci.correction = floor(x2) - x2;
+    }
   }
+  return ci;
 }
 
 CollisionInfo TileMap::YCollide(const Rect& rect, double dy) const {
@@ -302,28 +302,29 @@ CollisionInfo TileMap::YCollide(const Rect& rect, double dy) const {
   double x2 = rect.x + rect.w;
   double y2 = rect.y + rect.h + dy;
 
-  CollisionInfo ci{TileType::NONE, 0};
+  CollisionInfo ci{{}, 0};
   TileType t = TileType::NONE;
 
   if (dy <= 0) {
     // Velocity is negative, check top side;
     if (t = AtPoint({x1, y1}); t != TileType::NONE) {
-      ci.type = t;
-      ci.correction = ceil(y1) - y1;
-    } else if (t = AtPoint({x2 - kBuffer, y1}); t != TileType::NONE) {
-      ci.type = t;
+      ci.types.insert(t);
       ci.correction = ceil(y1) - y1;
     }
-    return ci;
+    if (t = AtPoint({x2 - kBuffer, y1}); t != TileType::NONE) {
+      ci.types.insert(t);
+      ci.correction = ceil(y1) - y1;
+    }
   } else {
     // Velocity is positive, check bottom side.
     if (t = AtPoint({x1, y2 - kBuffer}); t != TileType::NONE) {
-      ci.type = t;
-      ci.correction = floor(y2) - y2;
-    } else if (t = AtPoint({x2 - kBuffer, y2 - kBuffer}); t != TileType::NONE) {
-      ci.type = t;
+      ci.types.insert(t);
       ci.correction = floor(y2) - y2;
     }
-    return ci;
+    if (t = AtPoint({x2 - kBuffer, y2 - kBuffer}); t != TileType::NONE) {
+      ci.types.insert(t);
+      ci.correction = floor(y2) - y2;
+    }
   }
+  return ci;
 }

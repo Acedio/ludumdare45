@@ -65,8 +65,8 @@ void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
   }
 }
 
-void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
-                  BoxManager* boxes) {
+std::vector<Event> Hero::Update(double t, ButtonState buttons,
+                                const TileMap& tilemap, BoxManager* boxes) {
   SDL_assert(boxes);
 
   // MOVEMENT
@@ -98,10 +98,14 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
   }
 
   if (CollisionInfo info = tilemap.XCollide(bounding_box, dx);
-      info.type == TileType::NONE) {
+      info.types.empty()) {
     bounding_box.x += dx;
   } else {
     // Tilemap collision.
+    if (info.types.size() == 1 && info.types.count(TileType::SPIKES) == 1) {
+      // Only spikes, you get died.
+      return {Event{EventType::DIE}};
+    }
     bounding_box.x += dx + info.correction;
     vel.x = 0;
   }
@@ -120,13 +124,18 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
   }
 
   if (CollisionInfo info = tilemap.YCollide(bounding_box, dy);
-      info.type == TileType::NONE) {
+      info.types.empty()) {
     if (!y_correction) {
       // No boxes hit, no ground hit.
       jump_state = JumpState::FALLING;
     }
     bounding_box.y += dy;
   } else {
+    // Tilemap collision.
+    if (info.types.size() == 1 && info.types.count(TileType::SPIKES) == 1) {
+      // Only spikes, you get died.
+      return {Event{EventType::DIE}};
+    }
     if (info.correction <= 0 && jump_state == JumpState::FALLING) {
       // We've been pushed up (hit ground). If we were previously falling (i.e.
       // not already on the ground), we are no longer falling.
@@ -137,6 +146,8 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
   }
 
   UpdateGrab(buttons, tilemap, boxes);
+
+  return {};
 }
 
 void Hero::Draw(SDL_Renderer* renderer) const {

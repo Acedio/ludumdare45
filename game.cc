@@ -5,19 +5,22 @@
 #include "log.h"
 
 void Game::Update(double t, ButtonState buttons) {
-  hero->Update(t, buttons, *tilemap, boxes.get());
+  std::vector<Event> events = hero->Update(t, buttons, *tilemap, boxes.get());
   boxes->Update(t, *tilemap);
   // TODO: Pipe in hero location.
-  auto events = objects->Update(t, Rect());
+  auto o_events = objects->Update(t, Rect());
+  events.insert(events.end(), o_events.begin(), o_events.end());
   for (const Event& event : events) {
     if (event.type == EventType::WIN) {
       std::cout << "YOU WIN!!!" << std::endl;
+    } else if (event.type == EventType::DIE) {
+      std::cout << "YOU DIE!!!" << std::endl;
     }
   }
 }
 
 void drawBackground(SDL_Renderer* renderer) {
-  SDL_SetRenderDrawColor(renderer, 0, 131, 233, 235);
+  SDL_SetRenderDrawColor(renderer, 131, 233, 235, 255);
   SDL_RenderClear(renderer);
 }
 

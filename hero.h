@@ -5,6 +5,7 @@
 
 #include "box.h"
 #include "buttons.h"
+#include "event.h"
 #include "geometry.h"
 #include "sprite.h"
 #include "tilemap.h"
@@ -25,8 +26,8 @@ enum class GrabState {
 
 class Hero {
  public:
-  void Update(double t, ButtonState buttons, const TileMap& tilemap,
-              BoxManager* boxes);
+  std::vector<Event> Update(double t, ButtonState buttons,
+                            const TileMap& tilemap, BoxManager* boxes);
   void Draw(SDL_Renderer* renderer) const;
 
   Hero(const TileSet* tileset, Vec pos)

@@ -58,7 +58,7 @@ void BoxManager::Update(double t, const TileMap& tilemap) {
           box.y_vel = 0;
         } else if (CollisionInfo info =
                        tilemap.YCollide(ToBoundingBox(col, box), dy);
-                   info.type != TileType::NONE) {
+                   !info.types.empty()) {
           // Collided with tilemap.
           box.stopped = true;
           box.y += dy + info.correction;
