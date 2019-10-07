@@ -9,6 +9,12 @@
 #include "sprite.h"
 #include "tilemap.h"
 
+enum class JumpState {
+  RECOVERING,
+  CAN_JUMP,
+  FALLING,
+};
+
 class Hero {
  public:
   void Update(double t, ButtonState buttons, const TileMap& tilemap, const
@@ -30,7 +36,7 @@ class Hero {
   Sprite right;
 
   bool facing_right = true;
-  bool falling = false;
+  JumpState jump_state = JumpState::RECOVERING;
 
   // ObjectType holding;
 };

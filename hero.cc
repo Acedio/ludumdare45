@@ -6,6 +6,15 @@ const double kHorizontalVel = 7.0;
 const double kGravityAcc = 20.0;
 const double kJumpVel = -15.0;
 
+const char* ToString(JumpState j) {
+  switch(j) {
+    case JumpState::CAN_JUMP: return "CAN_JUMP";
+    case JumpState::RECOVERING: return "RECOVERING";
+    case JumpState::FALLING: return "FALLING";
+    default: return "UNKNOWN JUMP STATE";
+  }
+}
+
 void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
                   const BoxManager& boxes) {
   if (buttons.left == buttons.right) {
@@ -18,9 +27,12 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
     vel.x = kHorizontalVel;
   }
 
-  if (buttons.jump && !falling) {
-    falling = true;
+  if (buttons.jump && jump_state == JumpState::CAN_JUMP) {
+    jump_state = JumpState::FALLING;
     vel.y = kJumpVel;
+  } else if (!buttons.jump && jump_state == JumpState::RECOVERING) {
+    // You must release jump before jumping again.
+    jump_state = JumpState::CAN_JUMP;
   }
 
   double dx = t*vel.x;
@@ -45,8 +57,11 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
   double dy = t*vel.y;
   auto y_correction = boxes.YCollide(bounding_box, dy);
   if (y_correction) {
-    // Hit a box, no longer falling.
-    falling = false;
+    if (jump_state == JumpState::FALLING) {
+      // Hit a box. If we were previously falling (i.e. not already on the box),
+      // we are no longer falling.
+      jump_state = JumpState::RECOVERING;
+    }
     vel.y = 0;
     dy += y_correction.value();
   }
@@ -55,13 +70,14 @@ void Hero::Update(double t, ButtonState buttons, const TileMap& tilemap,
       info.type == TileType::NONE) {
     if (!y_correction) {
       // No boxes hit, no ground hit.
-      falling = true;
+      jump_state = JumpState::FALLING;
     }
     bounding_box.y += dy;
   } else {
-    if (info.correction < 0) {
-      // We've hit ground, so no longer falling.
-      falling = false;
+    if (info.correction <= 0 && jump_state == JumpState::FALLING) {
+      // We've been pushed up (hit ground). If we were previously falling (i.e.
+      // not already on the ground), we are no longer falling.
+      jump_state = JumpState::RECOVERING;
     }
     bounding_box.y += dy + info.correction;
     vel.y = 0;
