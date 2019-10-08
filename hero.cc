@@ -3,8 +3,11 @@
 #include <iostream>
 
 const double kHorizontalVel = 7.0;
-const double kGravityAcc = 20.0;
-const double kJumpVel = -15.0;
+const double kGravityAcc = 50.0;
+// 3 tiles high.
+const double kJumpVel = -17.9;
+// 2 tiles high.
+const double kJumpVelWithBox = -14.9;
 const double kGrabReach = 0.3;
 
 const char* ToString(JumpState j) {
@@ -82,7 +85,11 @@ std::vector<Event> Hero::Update(double t, ButtonState buttons,
 
   if (buttons.jump && jump_state == JumpState::CAN_JUMP) {
     jump_state = JumpState::FALLING;
-    vel.y = kJumpVel;
+    if (holding && holding->type == BoxType::BOX) {
+      vel.y = kJumpVelWithBox;
+    } else {
+      vel.y = kJumpVel;
+    }
   } else if (!buttons.jump && jump_state == JumpState::RECOVERING) {
     // You must release jump before jumping again.
     jump_state = JumpState::CAN_JUMP;

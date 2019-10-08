@@ -1,2 +1,4 @@
 index.*
 asset_dir
+assets/*.csv
+leveldata.h
