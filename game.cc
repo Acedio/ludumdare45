@@ -9,7 +9,7 @@ void Game::Update(double t, ButtonState buttons) {
   std::vector<Event> events = hero->Update(t, buttons, *tilemap, boxes.get());
   boxes->Update(t, *tilemap);
   // TODO: Pipe in hero location.
-  auto o_events = objects->Update(t, Rect());
+  auto o_events = objects->Update(t, hero->BoundingBox());
   events.insert(events.end(), o_events.begin(), o_events.end());
   for (const Event& event : events) {
     if (event.type == EventType::WIN) {

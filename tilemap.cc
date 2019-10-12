@@ -63,7 +63,7 @@ TileMapObjectType TileToTileMapObjectType(Tile tile) {
       return TileMapObjectType::BOX;
     case 4:
       return TileMapObjectType::START;
-    case 5:
+    case 6:
       return TileMapObjectType::EXIT;
     default:
       return TileMapObjectType::NONE;

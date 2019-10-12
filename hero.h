@@ -30,6 +30,10 @@ class Hero {
                             const TileMap& tilemap, BoxManager* boxes);
   void Draw(SDL_Renderer* renderer) const;
 
+  Rect BoundingBox() const {
+    return bounding_box;
+  }
+
   Hero(const TileSet* tileset, Vec pos)
       : bounding_box{pos.x, pos.y, 0.8, 0.9},
         vel{0, 0},
