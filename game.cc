@@ -2,18 +2,22 @@
 
 #include <SDL_image.h>
 
+#include "leveldata.h"
 #include "log.h"
 
 void Game::Update(double t, ButtonState buttons) {
   std::vector<Event> events = hero->Update(t, buttons, *tilemap, boxes.get());
   boxes->Update(t, *tilemap);
   // TODO: Pipe in hero location.
-  auto o_events = objects->Update(t, Rect());
+  auto o_events = objects->Update(t, hero->BoundingBox());
   events.insert(events.end(), o_events.begin(), o_events.end());
   for (const Event& event : events) {
     if (event.type == EventType::WIN) {
+      ++level;
+      LoadLevel(level, tileset.get());
       std::cout << "YOU WIN!!!" << std::endl;
     } else if (event.type == EventType::DIE) {
+      LoadLevel(level, tileset.get());
       std::cout << "YOU DIE!!!" << std::endl;
     }
   }
@@ -33,6 +37,26 @@ void Game::Draw(SDL_Renderer* renderer) const {
   hero->Draw(renderer);
 }
 
+void Game::LoadLevel(int level, const TileSet* tileset) {
+  SDL_assert(level >= 0 && level < leveldata.size());
+  tilemap = TileMap::Load(leveldata[level], tileset);
+  boxes = std::make_unique<BoxManager>(tileset,
+                                       /*TODO: detect number of columns*/ 100);
+  objects = std::make_unique<ObjectManager>(tileset);
+
+  for (const TileMapObject& obj : tilemap->TileMapObjects()) {
+    if (obj.type == TileMapObjectType::START) {
+      Vec pos{obj.location.x, obj.location.y};
+      hero = std::make_unique<Hero>(tileset, pos);
+    } else if (obj.type == TileMapObjectType::BOX) {
+      boxes->Add(Vec{obj.location.x, obj.location.y});
+    } else {
+      Vec pos{obj.location.x, obj.location.y};
+      objects->AddTileMapObject(obj.type, pos);
+    }
+  }
+}
+
 std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
   std::unique_ptr<Game> game(new Game());
 
@@ -41,22 +65,9 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
     return nullptr;
   }
   game->tileset = std::make_unique<TileSet>(game->tileset_texture);
-  game->tilemap = TileMap::Load(game->tileset.get());
-  game->boxes = std::make_unique<BoxManager>(
-      game->tileset.get(), /*TODO: detect number of columns*/ 100);
-  game->objects = std::make_unique<ObjectManager>(game->tileset.get());
 
-  for (const TileMapObject& obj : game->tilemap->TileMapObjects()) {
-    if (obj.type == TileMapObjectType::START) {
-      Vec pos{obj.location.x, obj.location.y};
-      game->hero = std::make_unique<Hero>(game->tileset.get(), pos);
-    } else if (obj.type == TileMapObjectType::BOX) {
-      game->boxes->Add(Vec{obj.location.x, obj.location.y});
-    } else {
-      Vec pos{obj.location.x, obj.location.y};
-      game->objects->AddTileMapObject(obj.type, pos);
-    }
-  }
+  game->level = 0;
+  game->LoadLevel(game->level, game->tileset.get());
 
   return game;
 }

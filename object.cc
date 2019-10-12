@@ -1,8 +1,20 @@
 #include "object.h"
 
 std::vector<Event> ObjectManager::Update(double t, const Rect& hero_box) {
-  // TODO: check collision
-  return {};
+  std::vector<Event> events;
+  for (const Object& object : objects) {
+    if (!Intersects(object.bounding_box, hero_box)) {
+      continue;
+    }
+    switch (object.type) {
+      case ObjectType::EXIT:
+        events.push_back(Event{EventType::WIN});
+        break;
+      default:
+        break;
+    }
+  }
+  return events;
 }
 
 void ObjectManager::Draw(SDL_Renderer* renderer) const {
@@ -28,6 +40,7 @@ void ObjectManager::AddTileMapObject(TileMapObjectType type, Vec pos) {
   Object object;
   object.type = ToObjectType(type);
   object.bounding_box = {pos.x, pos.y, 1, 1};
+  // TODO: Make this dynamic.
   object.sprite = Sprite(tileset, 6);
   objects.push_back(object);
 }

@@ -28,7 +28,8 @@ struct Box {
 
 class BoxManager {
  public:
-  BoxManager(TileSet* tileset, int cols) : columns(cols), sprite(tileset, 3) {}
+  BoxManager(const TileSet* tileset, int cols)
+      : columns(cols), sprite(tileset, 3) {}
 
   // Round x to make sure that we don't skip into the wrong col.
   void Add(Vec pos);

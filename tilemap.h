@@ -69,7 +69,8 @@ class TileMap {
 
   TileType AtPoint(const Vec& p) const;
 
-  static std::unique_ptr<TileMap> Load(const TileSet* tileset);
+  static std::unique_ptr<TileMap> Load(
+      const std::vector<std::vector<int>>& tiledata, const TileSet* tileset);
 
  private:
   std::vector<std::vector<Tile>> map;

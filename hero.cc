@@ -37,7 +37,6 @@ void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
   if (grab_state == GrabState::RECOVERING && !buttons.grab) {
     grab_state = GrabState::CAN_GRAB;
   } else if (grab_state == GrabState::CAN_GRAB && buttons.grab) {
-    std::cout << "Attempting to grab." << std::endl;
     // try to grab a thing.
     if (jump_state == JumpState::FALLING) {
       // Can't grab while jumping.

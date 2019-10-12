@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include "leveldata.h"
-
 const int kTileRows = 16;
 const int kTileCols = 16;
 const int kTileWidth = 16;
@@ -65,7 +63,7 @@ TileMapObjectType TileToTileMapObjectType(Tile tile) {
       return TileMapObjectType::BOX;
     case 4:
       return TileMapObjectType::START;
-    case 5:
+    case 6:
       return TileMapObjectType::EXIT;
     default:
       return TileMapObjectType::NONE;
@@ -103,7 +101,8 @@ std::vector<TileMapObject> extractObjects(std::vector<std::vector<Tile>>* map) {
   return objects;
 }
 
-std::unique_ptr<TileMap> TileMap::Load(const TileSet* tileset) {
+std::unique_ptr<TileMap> TileMap::Load(
+    const std::vector<std::vector<int>>& tiledata, const TileSet* tileset) {
   auto map = std::make_unique<TileMap>();
 
   map->tileset = tileset;
@@ -112,7 +111,7 @@ std::unique_ptr<TileMap> TileMap::Load(const TileSet* tileset) {
   SDL_assert(TileToTileType(kEmptyTile) == TileType::NONE);
 
   // Makes a copy.
-  map->map = leveldata[0];
+  map->map = tiledata;
   // Tiled puts -1 on empty tiles by default.
   for (int y = 0; y < map->map.size(); ++y) {
     for (int x = 0; x < map->map[y].size(); ++x) {

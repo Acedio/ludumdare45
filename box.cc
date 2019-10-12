@@ -112,15 +112,12 @@ std::optional<GrabbedBox> BoxManager::GrabAt(Vec pos) {
       return std::nullopt;
     }
     // TODO: This seems brittle :P
-    std::cout << "stopped: " << box.stopped << " stacked_on: " << box.stacked_on
-              << std::endl;
     if (pos.y >= box.y && box.stopped && !box.stacked_on) {
       // There is indeed a box to grab.
       if (i > 0) {
         // Unstacked_on the below box if needed.
         columns[col][i-1].stacked_on = false;
       }
-      std::cout << "Grabbed!" << std::endl;
       GrabbedBox grabbed{box.type, sprite};
       columns[col].erase(columns[col].begin() + i);
       return grabbed;
