@@ -3,8 +3,10 @@
 
 #include "box.h"
 #include "buttons.h"
+#include "geometry.h"
 #include "hero.h"
 #include "object.h"
+#include "particle.h"
 #include "tilemap.h"
 
 class Game {
@@ -16,13 +18,15 @@ class Game {
 
   static std::unique_ptr<Game> Load(SDL_Renderer* renderer);
  private:
-  Game() {}
+  Game() : particles(Rect{-10, -10, 100, 100}) {}
 
   void LoadLevel(int level, const TileSet* tileset);
 
   std::unique_ptr<TileSet> tileset;
   // Owned.
   SDL_Texture* tileset_texture;
+  // TODO: Update with actual screen coords.
+  ParticleManager particles;
 
   int level = 0;
 
