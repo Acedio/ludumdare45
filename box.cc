@@ -15,8 +15,8 @@ void BoxManager::Add(Vec pos) {
             [](const Box& a, const Box& b) { return a.y > b.y; });
 }
 
-bool BoxManager::TryAdd(Vec upper_left, GrabbedBox box) {
-  // std::optional<double> BoxManager::YCollide(const Rect& rect, double dy) const {
+bool BoxManager::TryAdd(const TileMap& tilemap, Vec upper_left,
+                        GrabbedBox box) {
   Rect pos;
   pos.x = floor(upper_left.x + 0.5);
   pos.y = upper_left.y;
@@ -25,6 +25,10 @@ bool BoxManager::TryAdd(Vec upper_left, GrabbedBox box) {
 
   auto maybe_correction = YCollide(pos, 0);
   if (maybe_correction) {
+    return false;
+  }
+  // Make sure it's not colliding with the tilemap.
+  if (tilemap.CollidingWith(pos) != std::set<TileType>{TileType::NONE}) {
     return false;
   }
   Add(upper_left);

@@ -60,7 +60,7 @@ void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
       return;
     }
     SDL_assert(holding);
-    if (boxes->TryAdd(HeldUpperLeft(), holding.value())) {
+    if (boxes->TryAdd(tilemap, HeldUpperLeft(), holding.value())) {
       holding = std::nullopt;
       grab_state = GrabState::RECOVERING;
     }
