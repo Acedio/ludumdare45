@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <SDL2/SDL_mixer.h>
+
 #include "box.h"
 #include "buttons.h"
 #include "geometry.h"
@@ -25,6 +27,8 @@ class Game {
   std::unique_ptr<TileSet> tileset;
   // Owned.
   SDL_Texture* tileset_texture;
+  Mix_Chunk* sound;
+
   // TODO: Update with actual screen coords.
   ParticleManager particles;
 

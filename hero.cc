@@ -71,6 +71,8 @@ std::vector<Event> Hero::Update(double t, ButtonState buttons,
                                 const TileMap& tilemap, BoxManager* boxes) {
   SDL_assert(boxes);
 
+  std::vector<Event> events;
+
   // MOVEMENT
   if (buttons.left == buttons.right) {
     vel.x = 0;
@@ -83,6 +85,7 @@ std::vector<Event> Hero::Update(double t, ButtonState buttons,
   }
 
   if (buttons.jump && jump_state == JumpState::CAN_JUMP) {
+    events.push_back(Event{EventType::JUMP});
     jump_state = JumpState::FALLING;
     if (holding && holding->type == BoxType::BOX) {
       vel.y = kJumpVelWithBox;
@@ -153,7 +156,7 @@ std::vector<Event> Hero::Update(double t, ButtonState buttons,
 
   UpdateGrab(buttons, tilemap, boxes);
 
-  return {};
+  return events;
 }
 
 const Sprite& Hero::CurrentSprite() const {

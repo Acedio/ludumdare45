@@ -1,6 +1,7 @@
+#include <emscripten.h>
 #include <memory>
 #include <SDL.h>
-#include <emscripten.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "buttons.h"
 #include "game.h"
@@ -24,7 +25,7 @@ void gameLoop() {
 }
 
 int main() {
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
     return -1;
   }
 
@@ -38,6 +39,12 @@ int main() {
     return -1;
   }
   SDL_RenderSetScale(global_renderer, 2, 2);
+
+  // BUG: https://github.com/emscripten-ports/SDL2/issues/57
+  // BUG: https://github.com/emscripten-core/emscripten/issues/6511
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+    return -1;
+  }
 
   game = Game::Load(global_renderer);
   SDL_assert(game != nullptr);
