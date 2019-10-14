@@ -18,8 +18,11 @@ class TileSet {
   TileSet(SDL_Texture* tex) : tex(tex) {}
   void DrawTile(SDL_Renderer* renderer, Tile tile,
                 const SDL_Rect& dst) const;
+  void DrawTileAngle(SDL_Renderer* renderer, Tile tile, const SDL_Rect& dst,
+                     double rads) const;
 
  private:
+  SDL_Rect getTile(Tile tile) const;
   // Assumes 16x16 tilemap.
   SDL_Texture* tex;
 };
