@@ -37,6 +37,7 @@ int main() {
   if (!global_renderer) {
     return -1;
   }
+  SDL_RenderSetScale(global_renderer, 2, 2);
 
   game = Game::Load(global_renderer);
   SDL_assert(game != nullptr);
