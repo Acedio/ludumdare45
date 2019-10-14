@@ -23,6 +23,6 @@ void ParticleManager::Update(double t) {
 
 void ParticleManager::Draw(SDL_Renderer* renderer) const {
   for (const Particle& p : particles) {
-    p.sprite.Draw(renderer, ToSDLRect(p.rect));
+    p.sprite.DrawAngle(renderer, ToSDLRect(p.rect), p.angle);
   }
 }

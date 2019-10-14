@@ -19,8 +19,7 @@ SDL_Rect ToSDLRect(const Rect& rect) {
   return sr;
 }
 
-void TileSet::DrawTile(SDL_Renderer* renderer, Tile tile,
-                       const SDL_Rect& dst) const {
+SDL_Rect TileSet::getTile(Tile tile) const {
   SDL_assert(tile >= 0 && tile < kTileRows*kTileCols);
 
   int tile_x = tile % kTileCols;
@@ -32,7 +31,20 @@ void TileSet::DrawTile(SDL_Renderer* renderer, Tile tile,
   src.w = kTileWidth;
   src.h = kTileHeight;
 
+  return src;
+}
+
+void TileSet::DrawTile(SDL_Renderer* renderer, Tile tile,
+                       const SDL_Rect& dst) const {
+  SDL_Rect src = getTile(tile);
   SDL_RenderCopy(renderer, tex, &src, &dst);
+}
+
+void TileSet::DrawTileAngle(SDL_Renderer* renderer, Tile tile,
+                            const SDL_Rect& dst, double rads) const {
+  SDL_Rect src = getTile(tile);
+  double degrees = rads * (-180 / 3.14159);
+  SDL_RenderCopyEx(renderer, tex, &src, &dst, degrees, NULL, SDL_FLIP_NONE);
 }
 
 const char* ToString(TileType type) {
