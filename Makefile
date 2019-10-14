@@ -14,16 +14,17 @@ leveldata.h: $(CSV_FILES) csv_to_map.sh
 	./csv_to_map.sh $(sort $(CSV_FILES)) > $@
 
 asset_dir: assets/tiles.png
-	mkdir asset_dir && cp assets/tiles.png asset_dir
+	-mkdir asset_dir
+	cp assets/tiles.png asset_dir
 
 index.html: $(SRC_FILES) $(HDR_FILES) leveldata.h asset_dir
 	em++ $(SRC_FILES) $(CFLAGS) -g -s DEMANGLE_SUPPORT=1 -o $@
 
 release/index.html: $(SRC_FILES) $(HDR_FILES) leveldata.h asset_dir
-	mkdir release
+	-mkdir release
 	em++ $(SRC_FILES) $(CFLAGS) -Os -o $@
 
 clean:
-	rm -r asset_dir
-	rm -r release
-	rm index.* leveldata.h assets/*.csv
+	-rm -r asset_dir
+	-rm -r release
+	-rm index.* leveldata.h assets/*.csv

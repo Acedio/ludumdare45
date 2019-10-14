@@ -29,7 +29,7 @@ int main() {
   }
 
   // TODO: Set up a context to remove the globals.
-  global_window = SDL_CreateWindow("Window!", 0, 0, 640, 480, 0);
+  global_window = SDL_CreateWindow("Lift Off!", 0, 0, 640, 480, 0);
   if (!global_window) {
     return -1;
   }
