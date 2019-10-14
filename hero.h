@@ -33,6 +33,7 @@ class Hero {
   Rect BoundingBox() const {
     return bounding_box;
   }
+  const Sprite& CurrentSprite() const;
 
   Hero(const TileSet* tileset, Vec pos)
       : bounding_box{pos.x, pos.y, 0.8, 0.9},

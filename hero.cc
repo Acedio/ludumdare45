@@ -60,7 +60,7 @@ void Hero::UpdateGrab(ButtonState buttons, const TileMap& tilemap,
       return;
     }
     SDL_assert(holding);
-    if (boxes->TryAdd(HeldUpperLeft(), holding.value())) {
+    if (boxes->TryAdd(tilemap, HeldUpperLeft(), holding.value())) {
       holding = std::nullopt;
       grab_state = GrabState::RECOVERING;
     }
@@ -156,17 +156,21 @@ std::vector<Event> Hero::Update(double t, ButtonState buttons,
   return {};
 }
 
+const Sprite& Hero::CurrentSprite() const {
+  if (facing_right) {
+    return right;
+  } else {
+    return left;
+  }
+}
+
 void Hero::Draw(SDL_Renderer* renderer) const {
   // The sprite is a unit square that should be bottom aligned and horizontally
   // centered around the bounding_box.
   Rect sprite_box{bounding_box.x - (1 - bounding_box.w) / 2,
                   bounding_box.y - (1 - bounding_box.h), 1, 1};
   SDL_Rect dst = ToSDLRect(sprite_box);
-  if (facing_right) {
-    right.Draw(renderer, dst);
-  } else {
-    left.Draw(renderer, dst);
-  }
+  CurrentSprite().Draw(renderer, dst);
   if (holding) {
     Vec upper_left = HeldUpperLeft();
     Rect box_sprite_box{upper_left.x, upper_left.y, 1, 1};

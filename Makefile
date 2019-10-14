@@ -16,7 +16,6 @@ leveldata.h: $(CSV_FILES) csv_to_map.sh
 asset_dir: assets/tiles.png
 	mkdir asset_dir && cp assets/tiles.png asset_dir
 
-# TODO: https://www.gnu.org/software/make/manual/html_node/Pattern-Rules.html
 index.html: $(SRC_FILES) $(HDR_FILES) leveldata.h asset_dir
 	em++ $(SRC_FILES) $(CFLAGS) -g -s DEMANGLE_SUPPORT=1 -o $@
 

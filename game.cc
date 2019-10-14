@@ -17,10 +17,19 @@ void Game::Update(double t, ButtonState buttons) {
       LoadLevel(level, tileset.get());
       std::cout << "YOU WIN!!!" << std::endl;
     } else if (event.type == EventType::DIE) {
+      particles.Add(Particle{
+          .rect = hero->BoundingBox(),
+          .sprite = hero->CurrentSprite(),
+          .vel = {5.0, -10.0},
+          .angle = 0,
+          .rot_vel = 4,
+          .remove = false,
+      });
       LoadLevel(level, tileset.get());
       std::cout << "YOU DIE!!!" << std::endl;
     }
   }
+  particles.Update(t);
 }
 
 void drawBackground(SDL_Renderer* renderer) {
@@ -35,6 +44,7 @@ void Game::Draw(SDL_Renderer* renderer) const {
   // TODO: Maybe have some objects in front and some behind?
   objects->Draw(renderer);
   hero->Draw(renderer);
+  particles.Draw(renderer);
 }
 
 void Game::LoadLevel(int level, const TileSet* tileset) {
