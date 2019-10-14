@@ -27,6 +27,8 @@ void Game::Update(double t, ButtonState buttons) {
       });
       LoadLevel(level, tileset.get());
       std::cout << "YOU DIE!!!" << std::endl;
+    } else if (event.type == EventType::JUMP) {
+      Mix_PlayChannel(-1, sound, 0);
     }
   }
   particles.Update(t);
@@ -76,6 +78,11 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
   }
   game->tileset = std::make_unique<TileSet>(game->tileset_texture);
 
+  game->sound = Mix_LoadWAV("asset_dir/jump.wav");
+  if (!game->sound) {
+    return nullptr;
+  }
+
   game->level = 0;
   game->LoadLevel(game->level, game->tileset.get());
 
@@ -85,5 +92,8 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
 Game::~Game() {
   if (tileset_texture) {
     SDL_DestroyTexture(tileset_texture);
+  }
+  if (sound) {
+    Mix_FreeChunk(sound);
   }
 }
