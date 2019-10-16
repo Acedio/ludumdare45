@@ -1,4 +1,4 @@
-all: index.html
+all: main.js
 
 SRC_FILES := $(wildcard *.cc)
 HDR_FILES := $(wildcard *.h)
@@ -17,12 +17,15 @@ asset_dir: assets/*.png assets/*.wav
 	-mkdir $@
 	cp $^ $@
 
-index.html: $(SRC_FILES) $(HDR_FILES) leveldata.h asset_dir
+main.js: $(SRC_FILES) $(HDR_FILES) leveldata.h asset_dir
 	em++ $(SRC_FILES) $(CFLAGS) -g -s DEMANGLE_SUPPORT=1 -o $@
 
-release/index.html: $(SRC_FILES) $(HDR_FILES) leveldata.h asset_dir
+release: release/main.js
+
+release/main.js: $(SRC_FILES) $(HDR_FILES) leveldata.h asset_dir index.html
 	-mkdir release
 	em++ $(SRC_FILES) $(CFLAGS) -Os -o $@
+	cp index.html release
 
 clean:
 	-rm -r asset_dir
