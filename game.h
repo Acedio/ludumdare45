@@ -27,12 +27,17 @@ class Game {
   std::unique_ptr<TileSet> tileset;
   // Owned.
   SDL_Texture* tileset_texture;
+  SDL_Texture* overlay_texture;
   Mix_Chunk* sound;
+
+  void InitializeSound();
 
   // TODO: Update with actual screen coords.
   ParticleManager particles;
 
   int level = 0;
+  bool audio_initialized = false;
+  bool audio_error = true;
 
   // These are reloaded with each level load.
   std::unique_ptr<TileMap> tilemap;
