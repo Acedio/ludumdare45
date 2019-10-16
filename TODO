@@ -1,8 +1,9 @@
 # For V1
-* Non-emscripten branded page.
 * Another few levels.
+* Add license.
 
 # Later
+* Fullscreen mode.
 * Animations (hero wobble).
 * More levels.
 * Particle effects (jump/landing dust).
