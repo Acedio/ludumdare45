@@ -16,6 +16,10 @@ void Game::Update(double t, ButtonState buttons) {
       LoadLevel(level, tileset.get());
       std::cout << "YOU WIN!!!" << std::endl;
     } else if (event.type == EventType::DIE) {
+      InitializeSound();
+      if (!audio_error && hurt_sound) {
+        Mix_PlayChannel(-1, hurt_sound, 0);
+      }
       particles.Add(Particle{
           .rect = hero->BoundingBox(),
           .sprite = hero->CurrentSprite(),
@@ -29,8 +33,8 @@ void Game::Update(double t, ButtonState buttons) {
     } else if (event.type == EventType::JUMP) {
       // TODO: Move this or make it happen on first sound.
       InitializeSound();
-      if (!audio_error && sound) {
-        Mix_PlayChannel(-1, sound, 0);
+      if (!audio_error && jump_sound) {
+        Mix_PlayChannel(-1, jump_sound, 0);
       }
     }
   }
@@ -84,7 +88,8 @@ void Game::InitializeSound() {
     audio_initialized = true;
 
     if (!audio_error) {
-      sound = Mix_LoadWAV("asset_dir/jump.wav");
+      jump_sound = Mix_LoadWAV("asset_dir/jump.wav");
+      hurt_sound = Mix_LoadWAV("asset_dir/hurt.wav");
     }
   }
 }
@@ -113,7 +118,13 @@ Game::~Game() {
   if (tileset_texture) {
     SDL_DestroyTexture(tileset_texture);
   }
-  if (sound) {
-    Mix_FreeChunk(sound);
+  if (overlay_texture) {
+    SDL_DestroyTexture(overlay_texture);
+  }
+  if (jump_sound) {
+    Mix_FreeChunk(jump_sound);
+  }
+  if (hurt_sound) {
+    Mix_FreeChunk(hurt_sound);
   }
 }

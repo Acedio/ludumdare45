@@ -28,7 +28,8 @@ class Game {
   // Owned.
   SDL_Texture* tileset_texture;
   SDL_Texture* overlay_texture;
-  Mix_Chunk* sound;
+  Mix_Chunk* jump_sound;
+  Mix_Chunk* hurt_sound;
 
   void InitializeSound();
 
