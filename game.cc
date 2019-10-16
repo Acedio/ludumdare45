@@ -8,7 +8,6 @@
 void Game::Update(double t, ButtonState buttons) {
   std::vector<Event> events = hero->Update(t, buttons, *tilemap, boxes.get());
   boxes->Update(t, *tilemap);
-  // TODO: Pipe in hero location.
   auto o_events = objects->Update(t, hero->BoundingBox());
   events.insert(events.end(), o_events.begin(), o_events.end());
   for (const Event& event : events) {
@@ -28,7 +27,11 @@ void Game::Update(double t, ButtonState buttons) {
       LoadLevel(level, tileset.get());
       std::cout << "YOU DIE!!!" << std::endl;
     } else if (event.type == EventType::JUMP) {
-      Mix_PlayChannel(-1, sound, 0);
+      // TODO: Move this or make it happen on first sound.
+      InitializeSound();
+      if (!audio_error && sound) {
+        Mix_PlayChannel(-1, sound, 0);
+      }
     }
   }
   particles.Update(t);
@@ -42,6 +45,10 @@ void drawBackground(SDL_Renderer* renderer) {
 void Game::Draw(SDL_Renderer* renderer) const {
   drawBackground(renderer);
   tilemap->Draw(renderer);
+  if (level == 0) {
+    SDL_RenderCopy(renderer, overlay_texture, NULL, NULL);
+  }
+
   boxes->Draw(renderer);
   // TODO: Maybe have some objects in front and some behind?
   objects->Draw(renderer);
@@ -69,6 +76,19 @@ void Game::LoadLevel(int level, const TileSet* tileset) {
   }
 }
 
+void Game::InitializeSound() {
+  if (!audio_initialized) {
+    // BUG: https://github.com/emscripten-ports/SDL2/issues/57
+    // BUG: https://github.com/emscripten-core/emscripten/issues/6511
+    audio_error = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0;
+    audio_initialized = true;
+
+    if (!audio_error) {
+      sound = Mix_LoadWAV("asset_dir/jump.wav");
+    }
+  }
+}
+
 std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
   std::unique_ptr<Game> game(new Game());
 
@@ -78,8 +98,8 @@ std::unique_ptr<Game> Game::Load(SDL_Renderer* renderer) {
   }
   game->tileset = std::make_unique<TileSet>(game->tileset_texture);
 
-  game->sound = Mix_LoadWAV("asset_dir/jump.wav");
-  if (!game->sound) {
+  game->overlay_texture = IMG_LoadTexture(renderer, "asset_dir/overlay.png");
+  if (!game->overlay_texture) {
     return nullptr;
   }
 
