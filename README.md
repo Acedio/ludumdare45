@@ -2,6 +2,8 @@
 
 ![Screenshot](/screenshot.png?raw=true)
 
+[Try it now!](https://acedio.github.io/ludumdare45/)
+
 This was my (unfinished at the time) entry for
 [Ludum Dare 45](https://ldjam.com/events/ludum-dare/45/lift-off). In an effort
 to finish more projects I polished it up some more after the compo ended :)
