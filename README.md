@@ -19,3 +19,4 @@ lot easier to get running online.
  * SDL 2.0
  * Emscripten
  * jsfxr
+ * Tiled
