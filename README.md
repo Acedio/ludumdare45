@@ -16,6 +16,6 @@ up and compiling there. I’m not very familiar with JavaScript, so this made it
 lot easier to get running online.
 
 ## Tools
-SDL 2.0
-Emscripten
-jsfxr
+ * SDL 2.0
+ * Emscripten
+ * jsfxr
